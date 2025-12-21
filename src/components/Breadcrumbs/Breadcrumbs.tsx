@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import './Breadcrumbs.css';
 
 // Словник для перекладу URL на українські назви
-const pathToUkrainian = {
+const pathToUkrainian: Record<string, string> = {
     'for-whom': 'Для кого ми',
     'services': 'Що ми створюємо',
     'web-apps': 'Веб-додатки',
@@ -79,20 +80,21 @@ const pathToUkrainian = {
     'innovations': 'Новації'
 };
 
-const Breadcrumbs = () => {
-    const location = useLocation();
-    const parts = location.pathname.split('/').filter(Boolean);
+const Breadcrumbs: React.FC = () => {
+const pathname = usePathname() || '/'; // Якщо null — використовуємо корінь
+const parts = pathname.split('/').filter(Boolean);
+
 
     const crumbs = parts.map((part, index) => {
         const path = '/' + parts.slice(0, index + 1).join('/');
         // Перевіряємо чи є переклад для цього шляху
-        const label = pathToUkrainian[part] ||
+        const label = pathToUkrainian[part] || 
             (decodeURI(part).charAt(0).toUpperCase() + decodeURI(part).slice(1));
 
         return (
             <span key={path} className="Breadcrumbs-crumb">
                 <ChevronRight size={14} />
-                <Link to={path} className="Breadcrumbs-link">
+                <Link href={path} className="Breadcrumbs-link">
                     {label}
                 </Link>
             </span>
@@ -102,7 +104,7 @@ const Breadcrumbs = () => {
     return (
         <div className="Breadcrumbs">
             <div className="Breadcrumbs-inner">
-                <Link to="/" className="Breadcrumbs-link">
+                <Link href="/" className="Breadcrumbs-link">
                     Головна
                 </Link>
                 {crumbs}
@@ -112,3 +114,4 @@ const Breadcrumbs = () => {
 };
 
 export default Breadcrumbs;
+

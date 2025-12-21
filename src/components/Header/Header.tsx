@@ -1,25 +1,31 @@
+'use client';
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, Search, Moon, Check, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { ThemeContext } from '../../contexts/ThemeContext';
 import { searchIndex } from '../../data/searchIndex';
 import './Header.css';
 import './Header.mobile.css';
 
-const Header = ({ toggleSidebar, isSidebarOpen }) => {
+interface HeaderProps {
+  toggleSidebar: () => void;
+  isSidebarOpen: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen }) => {
   const { t, i18n } = useTranslation();
   const { darkMode, toggleTheme } = useContext(ThemeContext);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [query, setQuery] = useState('');
   const [showPortalPopup, setShowPortalPopup] = useState(false);
 
-  const changeLanguage = (lng) => {
+  const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return;
     const value = query.trim().toLowerCase();
     if (!value) return;
@@ -27,13 +33,13 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
       item.label.toLowerCase().includes(value)
     );
     if (result) {
-      navigate(result.path);
+      router.push(result.path);
       setQuery('');
     }
   };
 
   const goToContact = () => {
-    navigate('/contact');
+    router.push('/contact');
   };
 
   const togglePortalPopup = () => {
@@ -42,12 +48,12 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
 
   const handleOrderProject = () => {
     setShowPortalPopup(false);
-    navigate('/briefs');
+    router.push('/briefs');
   };
 
   const handleContactUs = () => {
     setShowPortalPopup(false);
-    navigate('/contact');
+    router.push('/contact');
   };
 
   return (
@@ -93,7 +99,6 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
             {t('header.orderProject')}
           </button>
 
-          {/* Іконка особистого кабінету */}
           <button
             className="header-theme-btn"
             onClick={togglePortalPopup}
@@ -113,7 +118,6 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
         </div>
       </header>
 
-      {/* Popup особистого кабінету */}
       {showPortalPopup && (
         <>
           <div

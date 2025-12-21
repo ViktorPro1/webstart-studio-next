@@ -1,16 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Важливо для роботи кнопок
+import { useRouter } from 'next/navigation'; // Замість useNavigate
 import './DjonAssistant.css';
 import './DjonAssistant.mobile.css';
 
-const DjonAssistant = () => {
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
-    const messagesEndRef = useRef(null);
-    const navigate = useNavigate();
+// Типи
+type Button = {
+    label: string;
+    path: string;
+};
+
+type Message = {
+    id: number;
+    text: string;
+    sender: 'user' | 'bot';
+    buttons: Button[] | null;
+};
+
+const DjonAssistant: React.FC = () => {
+    const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+    const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState<string>('');
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
 
     useEffect(() => {
         const saved = localStorage.getItem('djonChatHistory');
@@ -32,15 +45,14 @@ const DjonAssistant = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const serviceFacts = [
+    const serviceFacts: string[] = [
         'Якісне резюме підвищує шанси на співбесіду в 3 рази!',
         'Лендінг з однією ціллю — конверсія до 30%!',
         'Професійне портфоліо збільшує чек на 20–50%!',
         'Ми робимо резюме за 1–2 дні, якщо горить!',
     ];
 
-    // Функція додавання повідомлення з підтримкою кнопок
-    const addMessage = (text, sender = 'bot', buttons = null) => {
+    const addMessage = (text: string, sender: 'user' | 'bot' = 'bot', buttons: Button[] | null = null) => {
         setMessages(prev => [...prev, { text, sender, id: Date.now(), buttons }]);
     };
 
@@ -51,58 +63,52 @@ const DjonAssistant = () => {
         setInput('');
 
         setTimeout(() => {
-            // ПРИВІТАННЯ ТА БАЗОВІ ФРАЗИ
             if (userText.includes('привіт') || userText.includes('добридень') || userText.includes('хай') || userText.includes('вітаю')) {
                 addMessage('Привіт! Я Джон — твій помічник. Чим можу допомогти? 😊');
-            }
-            // НОВІ ФРАЗИ: СУПЕР, ДЯКУЮ, СЛАВА УКРАЇНІ
+            } 
             else if (userText.includes('супер') || userText.includes('клас') || userText.includes('круто')) {
                 addMessage('Радий, що тобі подобається! Я стараюся. Що ще тебе цікавить? ✨');
-            }
+            } 
             else if (userText.includes('дякую') || userText.includes('спасибі')) {
                 addMessage('Будь ласка! Завжди радий допомогти. Звертайся ще! 🙏');
-            }
+            } 
             else if (userText.includes('слава україні')) {
                 addMessage('Героям Слава! 🇺🇦 Разом до перемоги!');
-            }
+            } 
             else if (userText.includes('як справи') || userText.includes('як ти')) {
                 addMessage('У мене все чудово! Працюю 24/7, щоб допомагати вам створювати круті проєкти. А як у тебе? 🤖');
-            }
-
-            // ПЕРЕГЛЯД МАКЕТІВ З КНОПКАМИ (Твоє прохання)
+            } 
             else if (userText.includes('переглянути') || userText.includes('макет') || userText.includes('де подивитись') || userText.includes('приклади')) {
                 addMessage('З радістю! Ось наші готові рішення. Натисни на кнопку, щоб перейти: 🎨', 'bot', [
                     { label: 'Дизайн портфоліо 🎨', path: '/templates/portfolio' },
                     { label: 'Електронне резюме 📄', path: '/templates/resume' },
                     { label: 'Односторінкові сайти 💻', path: '/templates/landing' }
                 ]);
-            }
-
-            // ІНШІ СЕРВІСИ
+            } 
             else if (userText.includes('ціна') || userText.includes('вартість') || userText.includes('пакет')) {
                 addMessage('Ось наші актуальні пакети послуг:', 'bot', [
                     { label: 'Переглянути ціни 💰', path: '/pricing' }
                 ]);
-            }
+            } 
             else if (userText.includes('реклама') || userText.includes('google') || userText.includes('facebook')) {
                 addMessage('Налаштовуємо рекламу професійно. Обери напрямок:', 'bot', [
                     { label: 'Google Ads 📈', path: '/google-ads/learning' },
                     { label: 'Facebook Ads 📣', path: '/facebook-ads/target-advertising' }
                 ]);
-            }
+            } 
             else if (userText.includes('польща') || userText.includes('подат')) {
                 addMessage('Допомагаємо з поверненням податків з Польщі! 🇵🇱', 'bot', [
                     { label: 'Детальніше 📄', path: '/poland-tax' }
                 ]);
-            }
+            } 
             else if (userText.includes('чистка') || userText.includes('пк')) {
                 addMessage('Твій комп’ютер буде як новий! 🚀', 'bot', [
                     { label: 'Чистка ПК віддалено 🖥️', path: '/pc-service' }
                 ]);
-            }
+            } 
             else if (userText.includes('факт')) {
                 addMessage('Ось факт: ' + serviceFacts[Math.floor(Math.random() * serviceFacts.length)]);
-            }
+            } 
             else {
                 addMessage('Хмм, не зовсім зрозумів запит... 🤔 Напиши "Переглянути", щоб побачити макети, або просто "Привіт"!');
             }
@@ -116,7 +122,6 @@ const DjonAssistant = () => {
 
     return (
         <>
-            {/* Попап */}
             {isPopupOpen && (
                 <div className="djon-popup-overlay">
                     <div className="djon-popup-container">
@@ -132,7 +137,6 @@ const DjonAssistant = () => {
                 </div>
             )}
 
-            {/* Кнопка чату */}
             {!isChatOpen && (
                 <button
                     onClick={() => setIsChatOpen(true)}
@@ -141,10 +145,8 @@ const DjonAssistant = () => {
                 >
                     <MessageCircle size={28} />
                 </button>
-
             )}
 
-            {/* Чат */}
             {isChatOpen && (
                 <div className="djon-chat-window">
                     <div className="djon-chat-header">
@@ -158,7 +160,7 @@ const DjonAssistant = () => {
 
                     <div className="djon-chat-messages">
                         {messages.length === 0 && <div className="djon-chat-empty">👋 Привіт! Чим можу допомогти?</div>}
-                        {messages.map(m => (
+                        {messages.map((m: Message) => (
                             <div key={m.id} className={`djon-message ${m.sender}`}>
                                 <div className="djon-message-content">
                                     {m.sender === 'bot' && (
@@ -167,15 +169,14 @@ const DjonAssistant = () => {
                                     <div className="djon-message-bubble">
                                         {m.text}
 
-                                        {/* ВІДОБРАЖЕННЯ КНОПОК ЯКЩО ВОНИ Є */}
                                         {m.buttons && (
                                             <div className="djon-chat-buttons-container" style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                {m.buttons.map((btn, idx) => (
+                                                {m.buttons.map((btn: Button, idx: number) => (
                                                     <button
                                                         key={idx}
                                                         className="djon-chat-btn-link"
                                                         onClick={() => {
-                                                            navigate(btn.path);
+                                                            router.push(btn.path);
                                                             if (window.innerWidth <= 768) setIsChatOpen(false);
                                                         }}
                                                         style={{

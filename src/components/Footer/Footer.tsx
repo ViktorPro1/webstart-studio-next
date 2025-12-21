@@ -1,12 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom'; // Додано для навігації
+import Link from 'next/link';
 import { Facebook, Send } from 'lucide-react';
 import { SiViber } from 'react-icons/si';
 import './Footer.css';
 import './Footer.mobile.css';
 
-const Footer = ({ isSidebarOpen }) => {
+interface FooterProps {
+  isSidebarOpen: boolean;
+}
+
+const Footer: React.FC<FooterProps> = ({ isSidebarOpen }) => {
   const { t } = useTranslation();
 
   return (
@@ -22,11 +26,11 @@ const Footer = ({ isSidebarOpen }) => {
 
           {/* Додані посилання на юридичні документи */}
           <div className="footer-links">
-            <Link to="/privacy-policy" className="footer-link">
+            <Link href="/privacy-policy" className="footer-link">
               {t('footer.privacyPolicy', { defaultValue: 'Політика конфіденційності' })}
             </Link>
             <span className="footer-separator">|</span>
-            <Link to="/terms-of-use" className="footer-link">
+            <Link href="/terms-of-use" className="footer-link">
               {t('footer.termsOfUse', { defaultValue: 'Умови використання' })}
             </Link>
           </div>
@@ -88,4 +92,5 @@ const Footer = ({ isSidebarOpen }) => {
 };
 
 export default Footer;
+
 
